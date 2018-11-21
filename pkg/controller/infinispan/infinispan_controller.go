@@ -59,7 +59,7 @@ func add(mgr manager.Manager, r reconcile.Reconciler) error {
 	// Watch for changes to secondary resource Pods and requeue the owner Infinispan
 	err = c.Watch(&source.Kind{Type: &appsv1.Deployment{}}, &handler.EnqueueRequestForOwner{
 		IsController: true,
-		OwnerType:    &cachev1alpha1.Memcached{},
+		OwnerType:    &cachev1alpha1.Infinispan{},
 	})
 	if err != nil {
 		return err
