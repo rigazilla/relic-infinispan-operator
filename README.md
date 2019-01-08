@@ -5,9 +5,9 @@ It has been developed following the tutorial [here](https://github.com/operator-
 
 My developement envronment is:
 
-vscode  
-go (GOPATH=$HOME/go)  
-operator-sdk (master)  
+vscode
+go (GOPATH=$HOME/go)
+operator-sdk (master)
 oc cluster up (okd 3.11)
 
 I would like to keep DONE and TODO list in [issues](https://github.com/rigazilla/infinispan-operator/issues), please post your wishes there.

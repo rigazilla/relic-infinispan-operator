@@ -8,6 +8,7 @@ import (
 
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
+	resource "k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
@@ -185,7 +186,7 @@ func (r *ReconcileInfinispan) deploymentForInfinispan(m *cachev1alpha1.Infinispa
 			Replicas: &replicas,
 			Selector: &metav1.LabelSelector{
 				MatchLabels: ls,
-			},			ConfigMap
+			},
 			Template: corev1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
 					Labels: ls,
@@ -195,6 +196,7 @@ func (r *ReconcileInfinispan) deploymentForInfinispan(m *cachev1alpha1.Infinispa
 						Image:   "jboss/infinispan-server:9.4.1.Final",
 						Name:    "infinispan",
 						Args:   []string {"custom/cloud-ephemeral.xml", "-Djboss.default.jgroups.stack=kubernetes"},
+						//Args:   []string {"-Djboss.default.jgroups.stack=kubernetes"},
 						Env:    []corev1.EnvVar{{Name: "OPENSHIFT_KUBE_PING_LABELS", Value: "cache"},
 												{Name: "OPENSHIFT_KUBE_PING_NAMESPACE", Value: "infinispan-test-1"},
 												{Name: "KUBERNETES_LABELS", Value: "cache"},
@@ -219,8 +221,8 @@ func (r *ReconcileInfinispan) deploymentForInfinispan(m *cachev1alpha1.Infinispa
 													PeriodSeconds: 10,
 													SuccessThreshold: 1,
 													TimeoutSeconds: 80},
-					//	Resources: corev1.ResourceRequirements{Requests: corev1.ResourceList   { corev1.ResourceName {"cpu"} : corev1.Resource.Quantity{"0.5"},
-					//	                                                                         corev1.ResourceName {"memory"} : corev1.Resource.Quantity{"512Mi"}}},
+						Resources: corev1.ResourceRequirements{Requests: corev1.ResourceList   { "cpu" : resource.MustParse("0.5"),
+						                                                                         "memory" : resource.MustParse("512Mi")}},
 						VolumeMounts: []corev1.VolumeMount{{MountPath: "/opt/jboss/infinispan-server/standalone/configuration/custom", Name: "infinispan-app-configuration"}},
 						
 					}},
