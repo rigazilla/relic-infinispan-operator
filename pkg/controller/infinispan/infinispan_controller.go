@@ -140,7 +140,7 @@ func (r *ReconcileInfinispan) Reconcile(request reconcile.Request) (reconcile.Re
 	// Update the Infinispan status with the pod names
 	// List the pods for this infinispan's deployment
 	podList := &corev1.PodList{}
-	labelSelector := labels.SelectorFromSet(labelsForInfinispan(infinispan.Name))
+	labelSelector := labels.SelectorFromSet(labelsForInfinispanSelector(infinispan.Name))
 	listOps := &client.ListOptions{Namespace: infinispan.Namespace, LabelSelector: labelSelector}
 	err = r.client.List(context.TODO(), listOps, podList)
 	if err != nil {
@@ -164,8 +164,7 @@ func (r *ReconcileInfinispan) Reconcile(request reconcile.Request) (reconcile.Re
 
 // deploymentForInfinispan returns an infinispan Deployment object
 func (r *ReconcileInfinispan) deploymentForInfinispan(m *cachev1alpha1.Infinispan) *appsv1.Deployment {
-	ls := labelsForInfinispan(m.Name)
-	replicas := m.Spec.Size
+	ls := labelsForInfinispan(m.Name, m.Spec.ClusterName)
 
 	dep := &appsv1.Deployment{
 		TypeMeta: metav1.TypeMeta{
@@ -183,7 +182,6 @@ func (r *ReconcileInfinispan) deploymentForInfinispan(m *cachev1alpha1.Infinispa
 			Labels: map[string]string{"template": "infinispan-ephemeral"},
 		},
 		Spec: appsv1.DeploymentSpec{
-			Replicas: &replicas,
 			Selector: &metav1.LabelSelector{
 				MatchLabels: ls,
 			},
@@ -196,7 +194,6 @@ func (r *ReconcileInfinispan) deploymentForInfinispan(m *cachev1alpha1.Infinispa
 						Image:   "jboss/infinispan-server:9.4.1.Final",
 						Name:    "infinispan",
 						Args:   []string {"custom/cloud-ephemeral.xml", "-Djboss.default.jgroups.stack=kubernetes"},
-						//Args:   []string {"-Djboss.default.jgroups.stack=kubernetes"},
 						Env:    []corev1.EnvVar{{Name: "OPENSHIFT_KUBE_PING_LABELS", Value: "cache"},
 												{Name: "OPENSHIFT_KUBE_PING_NAMESPACE", Value: "infinispan-test-1"},
 												{Name: "KUBERNETES_LABELS", Value: "cache"},
@@ -237,10 +234,15 @@ func (r *ReconcileInfinispan) deploymentForInfinispan(m *cachev1alpha1.Infinispa
 	return dep
 }
 
-// labelsForInfinispan returns the labels for selecting the resources
+// labelsForInfinispan returns the labels that must me applied to the pod
+func labelsForInfinispan(name string, clusterName string) map[string]string {
+	return map[string]string{"app": "infinispan-pod", "infinispan_cr": name, "clusterName": clusterName}
+}
+
+// labelsForInfinispanSelector returns the labels for selecting the resources
 // belonging to the given infinispan CR name.
-func labelsForInfinispan(name string) map[string]string {
-	return map[string]string{"app": "memcached", "memcached_cr": name}
+func labelsForInfinispanSelector(name string) map[string]string {
+	return map[string]string{"app": "infinispan-pod", "infinispan_cr": name}
 }
 
 // getPodNames returns the pod names of the array of pods passed in

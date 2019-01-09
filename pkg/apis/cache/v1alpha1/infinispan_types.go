@@ -13,6 +13,7 @@ type InfinispanSpec struct {
 	// Important: Run "operator-sdk generate k8s" to regenerate code after modifying this file
     // Size is the size of the Infinispan deployment
     Size int32 `json:"size"`
+    ClusterName string `json:"clustername"`
 }
 
 // InfinispanStatus defines the observed state of Infinispan
