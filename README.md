@@ -28,3 +28,21 @@ oc create configmap infinispan-app-configuration --from-file=./config  # this cr
 oc apply -f deploy/crds/cache_v1alpha1_infinispan_cr.yaml # this creates the cluster
 
 you can have fun and change the size parameter in cache_v1alpha1_infinispan_cr.yaml and apply it again to see the operator in action  
+
+### Running on an existing 4.0.0 cluster
+
+After the image is pushed to a public repo, edit ```deploy/operator.yaml``` and replace REPLACE_IMAGE by the correct image name.
+
+Then install the templates:
+```
+cd $GOPATH/src/github.com/rigazilla/infinispan-operator
+oc policy add-role-to-user view system:serviceaccount:$(oc project -q):default -n $(oc project -q)
+oc create configmap infinispan-app-configuration --from-file=./config
+
+oc apply -f deploy/service_account.yaml
+oc apply -f deploy/role.yaml
+oc apply -f deploy/role_binding.yaml
+oc apply -f deploy/crds/cache_v1alpha1_infinispan_crd.yaml
+oc apply -f deploy/operator.yaml
+oc apply -f deploy/crds/cache_v1alpha1_infinispan_cr.yaml
+```
