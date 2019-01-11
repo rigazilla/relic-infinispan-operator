@@ -194,9 +194,8 @@ func (r *ReconcileInfinispan) deploymentForInfinispan(m *cachev1alpha1.Infinispa
 						Image:   "jboss/infinispan-server:9.4.1.Final",
 						Name:    "infinispan",
 						Args:   []string {"custom/cloud-ephemeral.xml", "-Djboss.default.jgroups.stack=kubernetes"},
-						Env:    []corev1.EnvVar{{Name: "OPENSHIFT_KUBE_PING_LABELS", Value: "cache"},
-												{Name: "OPENSHIFT_KUBE_PING_NAMESPACE", Value: "infinispan-test-1"},
-												{Name: "KUBERNETES_LABELS", Value: "cache"},
+						Env:    []corev1.EnvVar{{Name: "KUBERNETES_NAMESPACE", Value: m.Namespace}, // TODO this is the right place for namespace?
+												{Name: "KUBERNETES_LABELS", Value: "clusterName="+m.Spec.ClusterName},
 												{Name: "MGMT_USER", Value: "infinispan"},
 												{Name: "MGMT_PASS", Value: "infinispan"},
 												{Name: "APP_USER", Value: "infinispan"},
