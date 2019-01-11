@@ -28,3 +28,16 @@ oc create configmap infinispan-app-configuration --from-file=./config  # this cr
 oc apply -f deploy/crds/cache_v1alpha1_infinispan_cr.yaml # this creates the cluster
 
 you can have fun and change the size parameter in cache_v1alpha1_infinispan_cr.yaml and apply it again to see the operator in action  
+
+## Buiding and pushing the image
+
+```
+cd $GOPATH  
+mkdir -p $GOPATH/src/github.com/rigazilla/  
+cd $GOPATH/src/github.com/rigazilla/  
+git clone https://github.com/rigazilla/infinispan-operator.git  
+cd infinispan-operator  
+operator-sdk build jboss/infinispan-server-operator  # Or other image name  
+
+docker push jboss/infinispan-server-operator  # Or other image name  
+```
