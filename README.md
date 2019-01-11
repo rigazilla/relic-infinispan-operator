@@ -29,6 +29,19 @@ oc apply -f deploy/crds/cache_v1alpha1_infinispan_cr.yaml # this creates the clu
 
 you can have fun and change the size parameter in cache_v1alpha1_infinispan_cr.yaml and apply it again to see the operator in action  
 
+## Buiding and pushing the image
+
+```
+cd $GOPATH  
+mkdir -p $GOPATH/src/github.com/rigazilla/  
+cd $GOPATH/src/github.com/rigazilla/  
+git clone https://github.com/rigazilla/infinispan-operator.git  
+cd infinispan-operator  
+operator-sdk build jboss/infinispan-server-operator  # Or other image name  
+
+docker push jboss/infinispan-server-operator  # Or other image name  
+```
+
 ### Running on an existing 4.0.0 cluster
 
 After the image is pushed to a public repo, edit ```deploy/operator.yaml``` and replace REPLACE_IMAGE by the correct image name.
@@ -45,4 +58,3 @@ oc apply -f deploy/role_binding.yaml
 oc apply -f deploy/crds/cache_v1alpha1_infinispan_crd.yaml
 oc apply -f deploy/operator.yaml
 oc apply -f deploy/crds/cache_v1alpha1_infinispan_cr.yaml
-```
