@@ -191,7 +191,7 @@ func (r *ReconcileInfinispan) deploymentForInfinispan(m *cachev1alpha1.Infinispa
 				},
 				Spec: corev1.PodSpec{
 					Containers: []corev1.Container{{
-						Image: "jboss/infinispan-server:9.4.1.Final",
+						Image: "jboss/infinispan-server:9.4.4.Final",
 						Name:  "infinispan",
 						Args:  []string{"custom/cloud-ephemeral.xml", "-Djboss.default.jgroups.stack=kubernetes"},
 						Env: []corev1.EnvVar{{Name: "KUBERNETES_NAMESPACE", Value: m.Namespace}, // TODO this is the right place for namespace?
