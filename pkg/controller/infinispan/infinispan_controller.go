@@ -8,8 +8,8 @@ import (
 
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
-	resource "k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/api/errors"
+	resource "k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -174,9 +174,9 @@ func (r *ReconcileInfinispan) deploymentForInfinispan(m *cachev1alpha1.Infinispa
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      m.Name,
 			Namespace: m.Namespace,
-			Annotations: map[string]string{ "description": "Infinispan 9 (Ephemeral)",
-				"iconClass": "icon-infinispan",
-				"openshift.io/display-name": "Infinispan 9 (Ephemeral)",
+			Annotations: map[string]string{"description": "Infinispan 9 (Ephemeral)",
+				"iconClass":                      "icon-infinispan",
+				"openshift.io/display-name":      "Infinispan 9 (Ephemeral)",
 				"openshift.io/documentation-url": "http://infinispan.org/documentation/",
 			},
 			Labels: map[string]string{"template": "infinispan-ephemeral"},
@@ -191,39 +191,39 @@ func (r *ReconcileInfinispan) deploymentForInfinispan(m *cachev1alpha1.Infinispa
 				},
 				Spec: corev1.PodSpec{
 					Containers: []corev1.Container{{
-						Image:   "jboss/infinispan-server:9.4.1.Final",
-						Name:    "infinispan",
-						Args:   []string {"custom/cloud-ephemeral.xml", "-Djboss.default.jgroups.stack=kubernetes"},
-						Env:    []corev1.EnvVar{{Name: "KUBERNETES_NAMESPACE", Value: m.Namespace}, // TODO this is the right place for namespace?
-												{Name: "KUBERNETES_LABELS", Value: "clusterName="+m.Spec.ClusterName},
-												{Name: "MGMT_USER", Value: "infinispan"},
-												{Name: "MGMT_PASS", Value: "infinispan"},
-												{Name: "APP_USER", Value: "infinispan"},
-												{Name: "APP_PASS", Value: "infinispan"}},
-						LivenessProbe: &corev1.Probe{ Handler: corev1.Handler{Exec: &corev1.ExecAction{Command: []string{"/usr/local/bin/is_running.sh"}}},
-													 FailureThreshold: 5,
-													 InitialDelaySeconds: 10,
-													 PeriodSeconds: 60,
-													 SuccessThreshold: 1,
-													 TimeoutSeconds: 80},
+						Image: "jboss/infinispan-server:9.4.1.Final",
+						Name:  "infinispan",
+						Args:  []string{"custom/cloud-ephemeral.xml", "-Djboss.default.jgroups.stack=kubernetes"},
+						Env: []corev1.EnvVar{{Name: "KUBERNETES_NAMESPACE", Value: m.Namespace}, // TODO this is the right place for namespace?
+							{Name: "KUBERNETES_LABELS", Value: "clusterName=" + m.Spec.ClusterName},
+							{Name: "MGMT_USER", Value: "infinispan"},
+							{Name: "MGMT_PASS", Value: "infinispan"},
+							{Name: "APP_USER", Value: "infinispan"},
+							{Name: "APP_PASS", Value: "infinispan"}},
+						LivenessProbe: &corev1.Probe{Handler: corev1.Handler{Exec: &corev1.ExecAction{Command: []string{"/usr/local/bin/is_running.sh"}}},
+							FailureThreshold:    5,
+							InitialDelaySeconds: 10,
+							PeriodSeconds:       60,
+							SuccessThreshold:    1,
+							TimeoutSeconds:      80},
 						Ports: []corev1.ContainerPort{{ContainerPort: 8080, Name: "http", Protocol: corev1.ProtocolTCP},
-														{ContainerPort: 9990, Name: "management", Protocol: corev1.ProtocolTCP},
-														{ContainerPort: 8888, Name: "ping", Protocol: corev1.ProtocolTCP},
-														{ContainerPort: 11222, Name: "hotrod", Protocol: corev1.ProtocolTCP},
-													},
-						ReadinessProbe: &corev1.Probe{ Handler: corev1.Handler{Exec: &corev1.ExecAction{Command: []string{"/usr/local/bin/is_healthy.sh"}}},
-													FailureThreshold: 5,
-													InitialDelaySeconds: 10,
-													PeriodSeconds: 10,
-													SuccessThreshold: 1,
-													TimeoutSeconds: 80},
-						Resources: corev1.ResourceRequirements{Requests: corev1.ResourceList   { "cpu" : resource.MustParse("0.5"),
-						                                                                         "memory" : resource.MustParse("512Mi")}},
+							{ContainerPort: 9990, Name: "management", Protocol: corev1.ProtocolTCP},
+							{ContainerPort: 8888, Name: "ping", Protocol: corev1.ProtocolTCP},
+							{ContainerPort: 11222, Name: "hotrod", Protocol: corev1.ProtocolTCP},
+						},
+						ReadinessProbe: &corev1.Probe{Handler: corev1.Handler{Exec: &corev1.ExecAction{Command: []string{"/usr/local/bin/is_healthy.sh"}}},
+							FailureThreshold:    5,
+							InitialDelaySeconds: 10,
+							PeriodSeconds:       10,
+							SuccessThreshold:    1,
+							TimeoutSeconds:      80},
+						Resources: corev1.ResourceRequirements{Requests: corev1.ResourceList{"cpu": resource.MustParse("0.5"),
+							"memory": resource.MustParse("512Mi")}},
 						VolumeMounts: []corev1.VolumeMount{{MountPath: "/opt/jboss/infinispan-server/standalone/configuration/custom", Name: "infinispan-app-configuration"}},
-						
 					}},
 					Volumes: []corev1.Volume{{VolumeSource: corev1.VolumeSource{ConfigMap: &corev1.ConfigMapVolumeSource{
-						                LocalObjectReference: corev1.LocalObjectReference{Name: "infinispan-app-configuration"}}}, Name: "infinispan-app-configuration"}},
+						LocalObjectReference: corev1.LocalObjectReference{Name: "infinispan-app-configuration"}}}, Name: "infinispan-app-configuration"}},
+					ServiceAccountName: "infinispan-operator",
 				},
 			},
 		},
